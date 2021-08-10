@@ -6,6 +6,7 @@ module.exports = {
         if (args.length === 0) return 'Please provide a day'; 
 
         const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        const borderColours = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(255, 255, 0)', 'rgb(255, 128, 0)', 'rgb(0, 255, 255)'];
 
         if (args[0].match(/(^today$)|(^t$)/)) {
             const day = new Date();
@@ -101,17 +102,20 @@ module.exports = {
             label: `Average ${inputDay.charAt(0).toUpperCase() + inputDay.slice(1)}`,
             data: graphData,
             fill: false,
-            borderColor: 'rgb(200, 0, 0)',
+            borderColor: 'rgb(0, 0, 0)',
+            borderWidth: '5',
             pointRadius: 0,
         })
         
         if (args[1] === 'true') {
+            datasets = datasets.slice(-6);
             for (let i = 0; i < datasets.length; i++) {
                 graphSets.push({
                     label: datasets[i].label.toLocaleString('en-GB', { timeZone: 'Europe/London' }).substring(0, 10),
                     data: datasets[i].data,
                     fill: false,
-                    borderColor: `rgb(${i*40}, ${i*40}, ${i*40})`,
+                    borderWidth: '2',
+                    borderColor: borderColours[i],
                     pointRadius: 0,
                 });
             }
