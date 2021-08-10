@@ -19,7 +19,7 @@ const scanner = new redisScan(redisClient);
 
 // Setup webserver
 const app = express();
-const PORT = 80;
+const PORT = 8080;
 app.use(cors());
 
 app.listen(PORT, () => {
