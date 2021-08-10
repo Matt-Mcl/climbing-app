@@ -44,7 +44,7 @@ class Graph extends Component {
             </Col>
           </Row>
         </Form>
-        <Image src={`${process.env.REACT_APP_API_SERVER}/getgraph?day=${this.state.day}&show=${this.state.show}`} alt="graph of climbing data" fluid />
+        <Image src={`${process.env.REACT_APP_API_SERVER}/getgraph?day=${this.state.day}&show=${this.state.show}&type=average`} alt="graph of climbing data" fluid />
       </>
     );
   }

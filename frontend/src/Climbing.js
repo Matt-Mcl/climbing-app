@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Image from 'react-bootstrap/Image'
 
 async function getClimbingCount() {
   const response = await fetch(process.env.REACT_APP_API_SERVER + "/getclimbingcount");
@@ -23,6 +24,7 @@ class Climbing extends Component {
     return (
       <h1>
         There are {this.state.count}/{this.state.capacity} people climbing.
+        <Image src={`${process.env.REACT_APP_API_SERVER}/getgraph?dates=t&type=default`} alt="graph of climbing data" fluid />
       </h1>
     );
   }

@@ -43,9 +43,17 @@ function setupRouter() {
   });  
 
   router.get("/getgraph", async function (req, res) {
-    const status = await graph.getGraph(redisClient, scanner, [req.query.day, req.query.show]);
-    if (status !== true) return res.send('ERROR: ' + status);
-    res.sendFile(__dirname + '/exportchart.png');
+    let status = false;
+    if (req.query.type === 'average') {
+      status = await graph.averageGraph(redisClient, scanner, [req.query.day, req.query.show]);
+      if (status !== true) return res.send('ERROR: ' + status);
+      res.sendFile(__dirname + '/exportchart.png');
+    } else if (req.query.type === 'default') {
+      status = await graph.regularGraph(redisClient, scanner, req.query.dates.split(','));
+      if (status !== true) return res.send('ERROR: ' + status);
+      res.sendFile(__dirname + '/exportchart.png');
+    }
+    
   }); 
 
   // All other GET requests not handled before will return our React app
