@@ -9,11 +9,11 @@ class Graph extends Component {
     }
 
     handleDayChange(event) {
-        this.setState({day: event.target.value, show: this.state.show});
+        this.setState({day: event.target.value});
     }
 
     handleShowChange(event) {
-        this.setState({day: this.state.day, show: event.target.value});
+        this.setState({show: event.target.value});
     }
 
     render() {
@@ -38,7 +38,7 @@ class Graph extends Component {
                 </div>
                 
                 <div>
-                <img src={`${process.env.REACT_APP_API_SERVER}/getgraph?day=${this.state.day}&show=${this.state.show}`} alt="graph of climbing data"></img>,
+                    <img src={`${process.env.REACT_APP_API_SERVER}/getgraph?day=${this.state.day}&show=${this.state.show}`} alt="graph of climbing data"></img>,
                 </div>
             </>
         );
