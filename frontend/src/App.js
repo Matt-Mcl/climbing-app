@@ -25,7 +25,7 @@ function App() {
         </Container>
       </Navbar>
 
-      <Container>
+      <Container style={{marginTop: "16px"}}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/climbing" element={<Climbing />} />

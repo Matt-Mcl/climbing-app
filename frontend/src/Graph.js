@@ -24,7 +24,7 @@ class Graph extends Component {
     return (
       <>
         <Form>
-          <Row style={{marginTop: "16px"}}>
+          <Row>
             <Col xs="auto">
               <Form.Label>Day:</Form.Label>
               <Form.Select value={this.state.day} onChange={this.handleDayChange}>
