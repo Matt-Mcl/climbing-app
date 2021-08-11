@@ -1,8 +1,8 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { Home } from "./pages";
 import Climbing from "./Climbing";
 import Graph from "./Graph";
+import Home from "./Home";
 
 import Navbar from 'react-bootstrap/Navbar'
 import Nav from 'react-bootstrap/Nav'
