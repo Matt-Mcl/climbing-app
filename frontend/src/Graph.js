@@ -23,7 +23,7 @@ class Graph extends Component {
   render() {
     return (
       <>
-        <Form>
+        <Form style={{marginBottom: "16px"}}>
           <Row>
             <Col xs="auto">
               <Form.Label>Day:</Form.Label>
