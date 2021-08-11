@@ -22,10 +22,10 @@ class Climbing extends Component {
   render() {
     if (this.state.count === null) return null;
     return (
-      <h1>
-        There are {this.state.count}/{this.state.capacity} people climbing.
+      <>
+        <h1> There are {this.state.count}/{this.state.capacity} people climbing.</h1>
         <Image src={`${process.env.REACT_APP_API_SERVER}/getgraph?dates=t&type=default`} alt="graph of climbing data" fluid />
-      </h1>
+      </>
     );
   }
 }
