@@ -1,23 +1,38 @@
 import React, { Component } from "react";
 import Form from 'react-bootstrap/Form'
 import Col from 'react-bootstrap/Col'
-import Image from 'react-bootstrap/Image'
 import Row from 'react-bootstrap/Row'
+import CreateChart from "./CreateChart.js";
 
-class Graph extends Component {
+async function getJSON(url) {
+  const response = await fetch(url);
+  const json = await response.json();
+  return json;
+}
+
+class AverageGraph extends Component {
   constructor() {
     super();
-    this.state = {day: 'today', show: true};
+    this.state = { query: {day: 'today', show: true}, graphData: null };
     this.handleDayChange = this.handleDayChange.bind(this)
     this.handleShowChange = this.handleShowChange.bind(this)
   }
 
+  componentDidMount() {
+    this.getGraph(this.state);
+  }
+
   handleDayChange(event) {
-    this.setState({day: event.target.value});
+    if (event.target.value) this.getGraph({query: {day: event.target.value, show: this.state.query.show}});
   }
 
   handleShowChange(event) {
-    this.setState({show: !this.state.show});
+    this.getGraph({query: {day: this.state.query.day, show: !this.state.query.show}});
+  }
+
+  async getGraph(newState) {
+    let data = await getJSON(`${process.env.REACT_APP_API_SERVER}/getgraph?day=${newState.query.day}&show=${newState.query.show}&type=average`);
+    this.setState({query: {day: newState.query.day, show: newState.query.show}, graphData: data});
   }
 
   render() {
@@ -27,7 +42,7 @@ class Graph extends Component {
           <Row>
             <Col xs="auto">
               <Form.Label>Day:</Form.Label>
-              <Form.Select value={this.state.day} onChange={this.handleDayChange}>
+              <Form.Select value={this.state.query.day} onChange={this.handleDayChange}>
                 <option></option>
                 <option value="monday">Monday</option>
                 <option value="tuesday">Tuesday</option>
@@ -40,14 +55,14 @@ class Graph extends Component {
             </Col>
             <Col xs="auto">
               <Form.Label>Show:</Form.Label>
-              <Form.Check type="checkbox" checked={this.state.show} onChange={this.handleShowChange} />
+              <Form.Check type="checkbox" checked={this.state.query.show} onChange={this.handleShowChange} />
             </Col>
           </Row>
         </Form>
-        <Image src={`${process.env.REACT_APP_API_SERVER}/getgraph?day=${this.state.day}&show=${this.state.show}&type=average`} alt="graph of climbing data" fluid />
+        <CreateChart graphData={this.state.graphData} />
       </>
     );
   }
 }
 
-export default Graph;
+export default AverageGraph;

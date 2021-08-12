@@ -20,7 +20,7 @@ module.exports = {
     if (args.length === 0) return 'Please provide a day'; 
 
     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    const borderColours = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(255, 255, 0)', 'rgb(255, 128, 0)', 'rgb(0, 255, 255)'];
+    const borderColours = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(240, 240, 0)', 'rgb(255, 128, 0)', 'rgb(0, 255, 255)'];
 
     if (args[0].match(/(^today$)|(^t$)/)) {
       const day = new Date();
@@ -102,9 +102,9 @@ module.exports = {
       label: `Average ${inputDay.charAt(0).toUpperCase() + inputDay.slice(1)}`,
       data: graphData,
       fill: false,
+      borderWidth: '2',
       borderColor: 'rgb(0, 0, 0)',
-      borderWidth: '5',
-      pointRadius: 0,
+      pointRadius: 2.5,
     })
     
     if (args[1] === 'true') {
@@ -116,25 +116,18 @@ module.exports = {
           fill: false,
           borderWidth: '2',
           borderColor: borderColours[i],
-          pointRadius: 0,
+          pointRadius: 2.5,
         });
       }
     }
 
-    let myChart = new ChartJsImage();
-    myChart.setConfig({
+    return ({
       type: 'line',
       data: { 
         labels: times, 
         datasets: graphSets,
       },
     });
-
-    myChart.setWidth(1200).setHeight(600);
-
-    await myChart.toFile(path.resolve(__dirname + '/../exportchart.png'));
-
-    return true;
   },
 
   async regularGraph(redisClient, scanner, args) {
@@ -182,8 +175,9 @@ module.exports = {
           label: scanQuery.substring(16, 26),
           data: counts,
           fill: false,
+          borderWidth: '2',
           borderColor: borderColours[i],
-          pointRadius: 0,
+          pointRadius: 2.5,
         }
       );
     }
@@ -201,19 +195,12 @@ module.exports = {
       times.push(key.substring(28, 33));
     }
 
-    let myChart = new ChartJsImage();
-    myChart.setConfig({
+    return ({
       type: 'line',
       data: { 
         labels: times, 
         datasets: datasets,
       },
     });
-
-    myChart.setWidth(1200).setHeight(600);
-
-    await myChart.toFile(path.resolve(__dirname + '/../exportchart.png'));
-
-    return true;
   },
 };

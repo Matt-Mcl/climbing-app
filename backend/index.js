@@ -45,13 +45,9 @@ function setupRouter() {
   router.get("/getgraph", async function (req, res) {
     let status = false;
     if (req.query.type === 'average') {
-      status = await graph.averageGraph(redisClient, scanner, [req.query.day, req.query.show]);
-      if (status !== true) return res.send('ERROR: ' + status);
-      res.sendFile(__dirname + '/exportchart.png');
+      res.send(await graph.averageGraph(redisClient, scanner, [req.query.day, req.query.show]));
     } else if (req.query.type === 'default') {
-      status = await graph.regularGraph(redisClient, scanner, req.query.dates.split(','));
-      if (status !== true) return res.send('ERROR: ' + status);
-      res.sendFile(__dirname + '/exportchart.png');
+      res.send(await graph.regularGraph(redisClient, scanner, req.query.dates.split(',')));
     }
     
   }); 

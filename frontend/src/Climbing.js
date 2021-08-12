@@ -1,33 +1,61 @@
 import React, { Component } from "react";
-import Image from 'react-bootstrap/Image'
+import CreateChart from "./CreateChart.js";
 
-async function getClimbingCount() {
-  const response = await fetch(process.env.REACT_APP_API_SERVER + "/getclimbingcount");
-  const text = await response.text();
-  return text;
+async function getJSON(url) {
+  const response = await fetch(url);
+  const json = await response.json();
+  return json;
 }
 
-class Climbing extends Component {
+class ClimbingCount extends Component {
   constructor() {
     super();
-    this.state = {count: null, capacity: null};
+    this.state = {count: '---', capacity: '---'};
   }
 
   async componentDidMount() {
-    let data = await getClimbingCount();
-    data = JSON.parse(data);
+    let data = await getJSON(process.env.REACT_APP_API_SERVER + "/getclimbingcount");
     this.setState( {count: data.count, capacity: data.capacity} );
   }
 
   render() {
-    if (this.state.count === null) return null;
+    return <h1> There are {this.state.count}/{this.state.capacity} people climbing.</h1>
+  }
+}
+
+class ClimingGraph extends Component {
+  constructor() {
+    super();
+    this.state = null;
+  }
+
+  async componentDidMount() {
+    try {
+      let data = await getJSON(`${process.env.REACT_APP_API_SERVER}/getgraph?dates=t&type=default`);
+      this.setState(data);
+    } catch {
+      this.setState({data: 'nodata'});
+    }
+  }
+
+  render() {
+    if (this.state === null) return "";
+    if (this.state.data === 'nodata') return <h4>No data for today yet. Centre opens at 10am</h4>;
     return (
       <>
-        <h1> There are {this.state.count}/{this.state.capacity} people climbing.</h1>
-        <Image src={`${process.env.REACT_APP_API_SERVER}/getgraph?dates=t&type=default`} alt="graph of climbing data" fluid />
+        <CreateChart graphData={this.state}/>
       </>
     );
   }
+}
+
+function Climbing() {
+  return (
+    <>
+      <ClimbingCount />
+      <ClimingGraph />      
+    </>
+  );
 }
 
 export default Climbing;
