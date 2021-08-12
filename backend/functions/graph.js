@@ -127,6 +127,24 @@ module.exports = {
         labels: times, 
         datasets: graphSets,
       },
+      options: {
+        scales: {
+          y: {
+            min: 0,
+            max: 100,
+            title: {
+              display: true,
+              text: 'Count'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Time'
+            }
+          }
+        }
+      }
     });
   },
 
@@ -201,6 +219,24 @@ module.exports = {
         labels: times, 
         datasets: datasets,
       },
+      options: {
+        scales: {
+          y: {
+            min: 0,
+            max: 100,
+            title: {
+              display: true,
+              text: 'Count'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Time'
+            }
+          }
+        }
+      }
     });
   },
 };
