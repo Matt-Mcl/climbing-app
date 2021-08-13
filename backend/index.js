@@ -46,7 +46,7 @@ function setupRouter() {
     if (req.query.type === 'average') {
       res.send(await graph.averageGraph(redisClient, scanner, [req.query.day, req.query.show]));
     } else if (req.query.type === 'default') {
-      res.send(await graph.regularGraph(redisClient, scanner, req.query.dates.split(',')));
+      res.send(await graph.regularGraph(redisClient, scanner, req.query.dates));
     } else {
       res.send({error: 'No or invalid graph type provided'});
     }

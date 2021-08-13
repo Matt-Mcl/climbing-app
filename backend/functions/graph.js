@@ -152,7 +152,8 @@ module.exports = {
   },
 
   async regularGraph(redisClient, scanner, args) {
-    if (!args[0]) return {error: 'No date(s) provided'}; 
+    if (!args || !args[0]) return {error: 'No date(s) provided'}; 
+    args = args.split(',');
     if (args.length > 6) return {error: 'Too many dates provided'};
 
     const borderColours = ['rgb(200, 0, 0)', 'rgb(0, 200, 0)', 'rgb(0, 0, 200)', 'rgb(200, 200, 0)', 'rgb(200, 0, 200)', 'rgb(0, 200, 200)'];
