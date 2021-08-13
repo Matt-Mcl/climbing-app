@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import Climbing from "./Climbing";
-import Graph from "./Graph";
+import CreateGraph from "./CreateGraph";
+import AverageGraph from "./AverageGraph";
 import Home from "./Home";
 
 import Navbar from 'react-bootstrap/Navbar'
@@ -18,8 +18,8 @@ function App() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link href="/">Home</Nav.Link>
-              <Nav.Link href="/climbing">Climbing</Nav.Link>
-              <Nav.Link href="/graph">Graph</Nav.Link>
+              <Nav.Link href="/creategraph">Create Graph</Nav.Link>
+              <Nav.Link href="/averagegraph">Average Graph</Nav.Link>
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -28,8 +28,8 @@ function App() {
       <Container style={{marginTop: "16px"}}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/climbing" element={<Climbing />} />
-          <Route path="/graph" element={<Graph />} />
+          <Route path="/creategraph" element={<CreateGraph />} />
+          <Route path="/averagegraph" element={<AverageGraph />} />
         </Routes>
       </Container>
     </>

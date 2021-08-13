@@ -26,7 +26,7 @@ class AverageGraph extends Component {
     if (event.target.value) this.getGraph({query: {day: event.target.value, show: this.state.query.show}});
   }
 
-  handleShowChange(event) {
+  handleShowChange() {
     this.getGraph({query: {day: this.state.query.day, show: !this.state.query.show}});
   }
 
