@@ -3,7 +3,7 @@ import Chart from 'chart.js/auto';
 
 let LineChart;
 
-function CreateChart(props) {
+const CreateChart = React.memo((props) => {
   useEffect(() => {
     buildChart();
   });
@@ -20,6 +20,6 @@ function CreateChart(props) {
       <canvas id="LineChart" width="1200" height="600"/>
     </div>
   );
-}
+});
 
 export default CreateChart;

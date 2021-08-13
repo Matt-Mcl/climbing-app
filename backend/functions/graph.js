@@ -1,6 +1,3 @@
-const ChartJsImage = require('chartjs-to-image');
-const path = require('path');
-
 function formatDatetime(dt) {
   return new Date(`${dt.substring(6, 10)}-${dt.substring(3, 5)}-${dt.substring(0, 2)}T${dt.substring(12)}`);
 }
@@ -34,13 +31,74 @@ const options = {
   }
 }
 
+const borderColours = ['rgb(200, 0, 0)', 'rgb(0, 200, 0)', 'rgb(0, 0, 200)', 'rgb(200, 200, 0)', 'rgb(200, 0, 200)', 'rgb(0, 200, 200)', 'rgb(255, 128, 0)'];
+
+async function createGraph(redisClient, scanner, dates) {
+
+  let datasets = [];
+
+  for (let i = 0; i < dates.length; i++) {
+    let graphDate = dates[i].toLocaleString('en-GB', { timeZone: 'Europe/London' }).substring(0, 10);
+
+    const scanQuery = `Climbing count: ${graphDate}*`
+
+    let keys = await scan(scanner, scanQuery);
+
+    if (keys.length === 0) return {error: `No data for ${graphDate}`}; 
+
+    let counts = [];
+
+    for (let key of keys) {
+      let value = await new Promise((resolve, reject) => {
+        redisClient.get(key, function(err, reply) {
+          resolve(parseInt(reply.replace(/\r/, '')));
+        });
+      });
+      counts.push(value);
+    }
+
+    datasets.push(
+      {
+        label: scanQuery.substring(16, 26),
+        data: counts,
+        fill: false,
+        borderWidth: 2,
+        borderColor: borderColours[i],
+        pointRadius: 2.5,
+      }
+    );
+  }
+
+  let max = 0;
+
+  for (let i = 1; i < datasets.length; i++) {
+    if (datasets[i].data.length > datasets[max].data.length) max = i;
+  }
+
+  let times = [];
+  let keys = await scan(scanner, `Climbing count: ${datasets[max].label}*`);
+
+  for (let key of keys) {
+    times.push(key.substring(28, 33));
+  }
+
+  return ({
+    type: 'line',
+    data: { 
+      labels: times, 
+      datasets: datasets,
+    },
+    options: options,
+  });
+}
+
 module.exports = { 
+  //
   async averageGraph(redisClient, scanner, args) {
     if (!args[0]) return {error: 'No day provided'}; 
     if (args[1] && !args[1].match(/(^true$)|(^false$)/)) return {error: 'Show must be a boolean value'}; 
 
     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-    const borderColours = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(240, 240, 0)', 'rgb(255, 128, 0)', 'rgb(0, 255, 255)'];
 
     if (args[0].match(/(^today$)|(^t$)/)) {
       const day = new Date();
@@ -88,6 +146,8 @@ module.exports = {
     }
 
     datasets.push( { data: dataset, label: lastDate } );
+
+    datasets = datasets.slice(-6);
     
     let max = 0;
 
@@ -128,7 +188,6 @@ module.exports = {
     })
     
     if (args[1] === 'true') {
-      datasets = datasets.slice(-6);
       for (let i = 0; i < datasets.length; i++) {
         graphSets.push({
           label: datasets[i].label.toLocaleString('en-GB', { timeZone: 'Europe/London' }).substring(0, 10),
@@ -151,79 +210,59 @@ module.exports = {
     });
   },
 
+  //
   async regularGraph(redisClient, scanner, args) {
     if (!args || !args[0]) return {error: 'No date(s) provided'}; 
     args = args.split(',');
-    if (args.length > 6) return {error: 'Too many dates provided'};
+    if (args.length > 7) return {error: 'Too many dates provided'};
 
-    const borderColours = ['rgb(200, 0, 0)', 'rgb(0, 200, 0)', 'rgb(0, 0, 200)', 'rgb(200, 200, 0)', 'rgb(200, 0, 200)', 'rgb(0, 200, 200)'];
-
-    let datasets = [];
+    let dates = []
 
     for (let i = 0; i < args.length; i++) {
-      let graphDate;
       if (args[i].match(/(^today$)|(^t$)/)) {
         let d = new Date();
-        graphDate = d.toLocaleString('en-GB', { timeZone: 'Europe/London' }).substring(0, 10);
+        dates.push(d)
       } else if (args[i].match(/(^yesterday$)|(^y$)/)) {
         let d = new Date();
         d.setDate(d.getDate() - 1);
-        graphDate = d.toLocaleString('en-GB', { timeZone: 'Europe/London' }).substring(0, 10);
+        dates.push(d)
       } else if (!args[i].match(/^([0-9]{2}[/]){2}[0-9]{4}$/)) {
         return {error: `${args[i]} is not a valid date`}; 
       } else {       
-        graphDate = args[i];    
+        dates.push(args[i])    
       }
-
-      const scanQuery = `Climbing count: ${graphDate}*`
-
-      let keys = await scan(scanner, scanQuery);
-
-      if (keys.length === 0) return {error: `No data for ${graphDate}`}; 
-
-      let counts = [];
-
-      for (let key of keys) {
-        let value = await new Promise((resolve, reject) => {
-          redisClient.get(key, function(err, reply) {
-            resolve(parseInt(reply.replace(/\r/, '')));
-          });
-        });
-        counts.push(value);
-      }
-
-      datasets.push(
-        {
-          label: scanQuery.substring(16, 26),
-          data: counts,
-          fill: false,
-          borderWidth: 2,
-          borderColor: borderColours[i],
-          pointRadius: 2.5,
-        }
-      );
     }
 
-    let max = 0;
+    return createGraph(redisClient, scanner, dates);
+  },
 
-    for (let i = 1; i < datasets.length; i++) {
-      if (datasets[i].data.length > datasets[max].data.length) max = i;
+  //
+  async rangeGraph(redisClient, scanner, args) {
+    if (!args[0]) return {error: `No start date provided`};
+    if (!args[1]) return {error: `No end date provided`};
+
+    for (let i = 0; i < args.length; i++) {
+      if (!args[i].match(/^([0-9]{2}[/]){2}[0-9]{4}$/)) return {error: `${args[i]} is not a valid date`};
     }
 
-    let times = [];
-    let keys = await scan(scanner, `Climbing count: ${datasets[max].label}*`);
+    let dates = [];
 
-    for (let key of keys) {
-      times.push(key.substring(28, 33));
+    function formatDate(d) {
+      return new Date(`${d.substring(6, 10)}-${d.substring(3, 5)}-${d.substring(0, 2)}`);
     }
 
-    return ({
-      type: 'line',
-      data: { 
-        labels: times, 
-        datasets: datasets,
-      },
-      options: options,
-    });
+    let start = formatDate(args[0]);
+    let end = formatDate(args[1]);
+
+    if (end <= start) return {error: `End date must be after start date`};
+
+    while (start <= end) {
+      dates.push(new Date(start));
+      start.setDate(start.getDate() + 1);
+    }
+
+    if (dates.length > 7) return {error: 'Too many dates provided'};
+
+    return createGraph(redisClient, scanner, dates);
   },
 };

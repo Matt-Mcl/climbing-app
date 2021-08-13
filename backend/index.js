@@ -48,6 +48,8 @@ function setupRouter() {
       res.send(await graph.averageGraph(redisClient, scanner, [req.query.day, req.query.show]));
     } else if (req.query.type === 'default') {
       res.send(await graph.regularGraph(redisClient, scanner, req.query.dates));
+    } else if (req.query.type === 'range') {
+      res.send(await graph.rangeGraph(redisClient, scanner, [req.query.startdate, req.query.enddate]));
     } else {
       res.send({error: 'No or invalid graph type provided'});
     }
