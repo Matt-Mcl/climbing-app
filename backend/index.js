@@ -13,6 +13,7 @@ const redisClient = redis.createClient();
 
 redisClient.on("connect", function () {
   console.log("Redis client connected");
+  saveClimbing();
 });
 
 const scanner = new redisScan(redisClient);
@@ -64,3 +65,32 @@ app.use(function replaceableRouter(req, res, next) {
 
 //Start Express router
 setupRouter();
+
+// Retrieves components of the current date and time
+function getDateTime() {
+  let date = new Date();
+  let locale = date.toLocaleString('en-GB', { hour12: false, timeZone: 'Europe/London' });
+
+  let hours = locale.slice(-8).substring(0, 2);
+  let minutes = locale.slice(-5).substring(0, 2);
+
+  return [date, locale, hours, minutes]
+}
+
+// Saves climbing data to database every 5 minutes
+async function saveClimbing() {
+    
+  let [date, locale, hours, minutes] = getDateTime();
+
+  // Removes seconds
+  locale = locale.substring(0, locale.length - 3);
+
+  let timeoutMinutes = 5 - (date.getMinutes() % 5);
+  setTimeout(saveClimbing, timeoutMinutes * 60 * 1000);
+
+  if (date.getMinutes() % 5 === 0 && (!(hours >= 22 || hours <= 9) || (hours === '22' && minutes < 5))) {
+      const [count] = await climbing.getClimbingCount();
+      console.log(`Logged [Climbing count: ${locale} | ${count}]`);
+      redisClient.set(`Climbing count: ${locale}`, `${count}`);
+  }
+}
