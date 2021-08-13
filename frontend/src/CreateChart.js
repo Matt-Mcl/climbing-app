@@ -16,7 +16,7 @@ const CreateChart = React.memo((props) => {
     LineChart = new Chart(ctx, props.graphData);
   }
   return (
-    <div>
+    <div style={{backgroundColor: "rgb(240, 240, 240)"}}>
       <canvas id="LineChart" width="1200" height="600"/>
     </div>
   );
