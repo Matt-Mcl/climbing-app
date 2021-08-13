@@ -15,9 +15,29 @@ async function scan(scanner, query) {
   });
 }
 
+const options = {
+  scales: {
+    y: {
+      min: 0,
+      max: 100,
+      title: {
+        display: true,
+        text: 'Count'
+      }
+    },
+    x: {
+      title: {
+        display: true,
+        text: 'Time'
+      }
+    }
+  }
+}
+
 module.exports = { 
   async averageGraph(redisClient, scanner, args) {
-    if (args.length === 0) return 'Please provide a day'; 
+    if (!args[0]) return {error: 'No day provided'}; 
+    if (args[1] && !args[1].match(/(^true$)|(^false$)/)) return {error: 'Show must be a boolean value'}; 
 
     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     const borderColours = ['rgb(255, 0, 0)', 'rgb(0, 255, 0)', 'rgb(0, 0, 255)', 'rgb(240, 240, 0)', 'rgb(255, 128, 0)', 'rgb(0, 255, 255)'];
@@ -33,7 +53,7 @@ module.exports = {
 
     const inputDay = args[0].toLowerCase();
 
-    if (!days.includes(inputDay)) return 'Please provide a valid day'; 
+    if (!days.includes(inputDay)) return {error: 'Invalid day provided'};
 
     let keys = await scan(scanner, 'Climbing count: *');
 
@@ -52,7 +72,7 @@ module.exports = {
         if (!lastDate) lastDate = date;
         let value = await new Promise((resolve, reject) => {
           redisClient.get(key, function(err, reply) {
-            resolve(reply);
+            resolve(parseInt(reply.replace(/\r/, '')));
           });
         });
 
@@ -102,7 +122,7 @@ module.exports = {
       label: `Average ${inputDay.charAt(0).toUpperCase() + inputDay.slice(1)}`,
       data: graphData,
       fill: false,
-      borderWidth: '2',
+      borderWidth: 2,
       borderColor: 'rgb(0, 0, 0)',
       pointRadius: 2.5,
     })
@@ -114,7 +134,7 @@ module.exports = {
           label: datasets[i].label.toLocaleString('en-GB', { timeZone: 'Europe/London' }).substring(0, 10),
           data: datasets[i].data,
           fill: false,
-          borderWidth: '2',
+          borderWidth: 2,
           borderColor: borderColours[i],
           pointRadius: 2.5,
         });
@@ -127,30 +147,13 @@ module.exports = {
         labels: times, 
         datasets: graphSets,
       },
-      options: {
-        scales: {
-          y: {
-            min: 0,
-            max: 100,
-            title: {
-              display: true,
-              text: 'Count'
-            }
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Time'
-            }
-          }
-        }
-      }
+      options: options,
     });
   },
 
   async regularGraph(redisClient, scanner, args) {
-    if (args.length === 0) return 'Please provide a date'; 
-    if (args.length > 6) return 'Too many dates provided'; 
+    if (!args[0]) return {error: 'No date(s) provided'}; 
+    if (args.length > 6) return {error: 'Too many dates provided'};
 
     const borderColours = ['rgb(200, 0, 0)', 'rgb(0, 200, 0)', 'rgb(0, 0, 200)', 'rgb(200, 200, 0)', 'rgb(200, 0, 200)', 'rgb(0, 200, 200)'];
 
@@ -166,7 +169,7 @@ module.exports = {
         d.setDate(d.getDate() - 1);
         graphDate = d.toLocaleString('en-GB', { timeZone: 'Europe/London' }).substring(0, 10);
       } else if (!args[i].match(/^([0-9]{2}[/]){2}[0-9]{4}$/)) {
-        return `${args[i]} is not a valid date`; 
+        return {error: `${args[i]} is not a valid date`}; 
       } else {       
         graphDate = args[i];    
       }
@@ -175,14 +178,14 @@ module.exports = {
 
       let keys = await scan(scanner, scanQuery);
 
-      if (keys.length === 0) return `No data for ${graphDate}`; 
+      if (keys.length === 0) return {error: `No data for ${graphDate}`}; 
 
       let counts = [];
 
       for (let key of keys) {
         let value = await new Promise((resolve, reject) => {
           redisClient.get(key, function(err, reply) {
-            resolve(reply);
+            resolve(parseInt(reply.replace(/\r/, '')));
           });
         });
         counts.push(value);
@@ -193,7 +196,7 @@ module.exports = {
           label: scanQuery.substring(16, 26),
           data: counts,
           fill: false,
-          borderWidth: '2',
+          borderWidth: 2,
           borderColor: borderColours[i],
           pointRadius: 2.5,
         }
@@ -219,24 +222,7 @@ module.exports = {
         labels: times, 
         datasets: datasets,
       },
-      options: {
-        scales: {
-          y: {
-            min: 0,
-            max: 100,
-            title: {
-              display: true,
-              text: 'Count'
-            }
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Time'
-            }
-          }
-        }
-      }
+      options: options,
     });
   },
 };

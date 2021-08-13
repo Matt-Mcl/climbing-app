@@ -23,11 +23,10 @@ module.exports = {
     for (let key of keys) {
         let value = await new Promise((resolve, reject) => {
             redisClient.get(key, function(err, reply) {
-                resolve(reply);
+                resolve(parseInt(reply.replace(/\r/, '')));
             });
         });
         let date = key.substring(16, key.length);
-        value = value.replace(/\r/, '');
 
         records.push({datetime: date, count: value});
     }

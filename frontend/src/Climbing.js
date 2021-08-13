@@ -30,17 +30,13 @@ class ClimingGraph extends Component {
   }
 
   async componentDidMount() {
-    try {
-      let data = await getJSON(`${process.env.REACT_APP_API_SERVER}/getgraph?dates=t&type=default`);
-      this.setState(data);
-    } catch {
-      this.setState({data: 'nodata'});
-    }
+    let data = await getJSON(`${process.env.REACT_APP_API_SERVER}/getgraph?dates=t&type=default`);
+    this.setState(data);
   }
 
   render() {
     if (this.state === null) return "";
-    if (this.state.data === 'nodata') return <h4>No data for today yet. Centre opens at 10am</h4>;
+    if (this.state.error) return <h4>No data for today yet. Centre opens at 10am</h4>;
     return (
       <>
         <CreateChart graphData={this.state}/>

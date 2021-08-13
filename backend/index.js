@@ -43,13 +43,13 @@ function setupRouter() {
   });  
 
   router.get("/getgraph", async function (req, res) {
-    let status = false;
     if (req.query.type === 'average') {
       res.send(await graph.averageGraph(redisClient, scanner, [req.query.day, req.query.show]));
     } else if (req.query.type === 'default') {
       res.send(await graph.regularGraph(redisClient, scanner, req.query.dates.split(',')));
+    } else {
+      res.send({error: 'No or invalid graph type provided'});
     }
-    
   }); 
 
   // All other GET requests not handled before will return our React app
