@@ -156,7 +156,7 @@ module.exports = {
         });
         // Check if date has changed or not
         if (date.getTime() === lastDate.getTime()) {
-          // If it hasn't, it's pushed to a datasey
+          // If it hasn't, it's pushed to a dataset
           dataset.push( {value: value, time: time} );
         } else {
           // If it has, a new dataset is made for it
