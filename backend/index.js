@@ -3,10 +3,9 @@ const redis = require("redis");
 const redisScan = require("node-redis-scan");
 const cors = require('cors')
 const climbing = require("./functions/climbing.js");
-const data = require("./functions/data.js");
 const graph = require("./functions/graph.js");
 const path = require('path');
-
+const {MongoClient} = require('mongodb');
 
 // Setup Redis client
 const redisClient = redis.createClient();
@@ -17,6 +16,13 @@ redisClient.on("connect", function () {
 });
 
 const scanner = new redisScan(redisClient);
+
+// Setup Mongo client
+const mongoClient = new MongoClient('mongodb://127.0.0.1:27017');
+mongoClient.connect().then(console.log(`MongoDB Connected`));
+
+const climbingdb = mongoClient.db('climbingapp');
+const climbingData = climbingdb.collection('climbingdata');
 
 // Setup webserver
 const app = express();
@@ -34,9 +40,7 @@ let router;
 function setupRouter() {
   router = new express.Router();
 
-//   router.get("/", (req, res) => res.send("Hello World!"));
-
-  router.get("/data", async (req, res) => res.json(await data.getData(redisClient, scanner)));
+  router.get("/data", async (req, res) => res.json(await climbingData.find().toArray()));
 
   router.get("/getclimbingcount", async function (req, res) {
     const [count, capacity] = await climbing.getClimbingCount();
@@ -44,18 +48,18 @@ function setupRouter() {
   });  
 
   router.get("/getgraph", async function (req, res) {
-    if (req.query.type === 'average') {
-      res.send(await graph.averageGraph(redisClient, scanner, [req.query.day, req.query.show]));
-    } else if (req.query.type === 'default') {
-      res.send(await graph.regularGraph(redisClient, scanner, req.query.dates));
+    if (req.query.type === 'default') {
+      res.send(await graph.defaultGraph(climbingData, req.query.dates));
     } else if (req.query.type === 'range') {
-      res.send(await graph.rangeGraph(redisClient, scanner, [req.query.startdate, req.query.enddate]));
+      res.send(await graph.rangeGraph(climbingData, [req.query.startdate, req.query.enddate]));
+    } else if (req.query.type === 'average') {
+      res.send(await graph.averageGraph(climbingData, req.query.day, req.query.show));
     } else {
       res.send({error: 'No or invalid graph type provided'});
     }
-  }); 
+  });
 
-  // All other GET requests not handled before will return our React app
+  // All other GET requests not handled before will return the React app
   router.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'));
   });
@@ -94,5 +98,6 @@ async function saveClimbing() {
       const [count] = await climbing.getClimbingCount();
       console.log(`Logged [Climbing count: ${locale} | ${count}]`);
       redisClient.set(`Climbing count: ${locale}`, `${count}`);
+      climbingData.insertOne({ _id: locale, count: count}, (err, result) => { });
   }
 }
