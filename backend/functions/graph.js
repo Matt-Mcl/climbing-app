@@ -35,7 +35,7 @@ async function createGraph(climbingData, dates, averageData) {
     let offset = 0;
     let data = await climbingData.find( { _id: { $regex: dates[i] }} ).toArray();
     if (data.length === 0) return {error: `No data for ${dates[i]}`}; 
-    let label = formatDate(data[i]["_id"]);
+    let label = formatDate(data[0]["_id"]);
     let counts = data.map(item => item.count);
 
     // If the dataset label isn't the current day
