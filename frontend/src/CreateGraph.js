@@ -20,8 +20,9 @@ function formatDate(input) {
 
 function getDay(offset) {
   let d = new Date()
-  // If it's before 10 am, move the dates back one
-  if (new Date().getHours() < 10) offset++;
+  // If it's before 10 am UK time, move the dates back one
+  let hours = new Date().toLocaleString('en-GB', { hour12: false, timeZone: 'Europe/London' }).slice(-8).substring(0, 2);
+  if (hours < 10) offset++;
   d.setDate(d.getDate() - offset)
   return d.toISOString().substring(0, 10);
 }
