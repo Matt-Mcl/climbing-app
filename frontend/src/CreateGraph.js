@@ -20,6 +20,8 @@ function formatDate(input) {
 
 function getDay(offset) {
   let d = new Date()
+  // If it's before 10 am, move the dates back one
+  if (new Date().getHours() < 10) offset++;
   d.setDate(d.getDate() - offset)
   return d.toISOString().substring(0, 10);
 }

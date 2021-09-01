@@ -33,7 +33,8 @@ async function createGraph(climbingData, dates, averageData) {
 
   for (let i = 0; i < dates.length; i++) {
     let offset = 0;
-    let data = await climbingData.find({ _id: { $regex: dates[i] } } ).toArray();
+    let data = await climbingData.find( { _id: { $regex: dates[i] }} ).toArray();
+    if (data.length === 0) return {error: `No data for ${dates[i]}`}; 
     let label = formatDate(data[i]["_id"]);
     let counts = data.map(item => item.count);
 
@@ -181,7 +182,12 @@ module.exports = {
     }
 
     start.setDate(start.getDate() + difference);
-    start.setDate(start.getDate() - 35);
+
+    if (new Date().getHours() < 10) {
+      start.setDate(start.getDate() - 42);
+    } else {
+      start.setDate(start.getDate() - 35);
+    }
 
     let dates = [];
 
