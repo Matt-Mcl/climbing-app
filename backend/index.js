@@ -12,14 +12,14 @@ const redisClient = redis.createClient();
 
 redisClient.on("connect", function () {
   console.log("Redis client connected");
-  saveClimbing();
 });
-
-const scanner = new redisScan(redisClient);
 
 // Setup Mongo client
 const mongoClient = new MongoClient('mongodb://127.0.0.1:27017');
-mongoClient.connect().then(console.log(`MongoDB Connected`));
+mongoClient.connect().then(() => {
+  console.log(`MongoDB client connected`);
+  saveClimbing();
+});
 
 const climbingdb = mongoClient.db('climbingapp');
 const climbingData = climbingdb.collection('climbingdata');
