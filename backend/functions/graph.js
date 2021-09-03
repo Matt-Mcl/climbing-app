@@ -185,7 +185,7 @@ module.exports = {
 
     let hours = new Date().toLocaleString('en-GB', { hour12: false, timeZone: 'Europe/London' }).slice(-8).substring(0, 2);
 
-    if (hours < 10) {
+    if (hours < 10 && difference === 0) {
       start.setDate(start.getDate() - 42);
     } else {
       start.setDate(start.getDate() - 35);
