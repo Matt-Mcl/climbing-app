@@ -35,41 +35,29 @@ app.listen(PORT, () => {
 // Have Node serve the files for our built React app
 app.use(express.static(path.resolve(__dirname, '../frontend/build')));
 
-let router;
-function setupRouter() {
-  router = new express.Router();
+app.get("/data", async (req, res) => res.json(await climbingData.find().toArray()));
 
-  router.get("/data", async (req, res) => res.json(await climbingData.find().toArray()));
+app.get("/getclimbingcount", async function (req, res) {
+  const [count, capacity] = await climbing.getClimbingCount();
+  res.json({count: count, capacity: capacity});
+});  
 
-  router.get("/getclimbingcount", async function (req, res) {
-    const [count, capacity] = await climbing.getClimbingCount();
-    res.json({count: count, capacity: capacity});
-  });  
-
-  router.get("/getgraph", async function (req, res) {
-    if (req.query.type === 'default') {
-      res.send(await graph.defaultGraph(climbingData, req.query.dates));
-    } else if (req.query.type === 'range') {
-      res.send(await graph.rangeGraph(climbingData, [req.query.startdate, req.query.enddate]));
-    } else if (req.query.type === 'average') {
-      res.send(await graph.averageGraph(climbingData, req.query.day, req.query.show));
-    } else {
-      res.send({error: 'No or invalid graph type provided'});
-    }
-  });
-
-  // All other GET requests not handled before will return the React app
-  router.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'));
-  });
-}
-
-app.use(function replaceableRouter(req, res, next) {
-  router(req, res, next);
+app.get("/getgraph", async function (req, res) {
+  if (req.query.type === 'default') {
+    res.send(await graph.defaultGraph(climbingData, req.query.dates));
+  } else if (req.query.type === 'range') {
+    res.send(await graph.rangeGraph(climbingData, [req.query.startdate, req.query.enddate]));
+  } else if (req.query.type === 'average') {
+    res.send(await graph.averageGraph(climbingData, req.query.day, req.query.show));
+  } else {
+    res.send({error: 'No or invalid graph type provided'});
+  }
 });
 
-//Start Express router
-setupRouter();
+// All other GET requests not handled before will return the React app
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'));
+});
 
 // Retrieves components of the current date and time
 function getDateTime() {
