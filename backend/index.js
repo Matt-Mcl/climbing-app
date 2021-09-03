@@ -1,6 +1,5 @@
 const express = require("express");
 const redis = require("redis");
-const redisScan = require("node-redis-scan");
 const cors = require('cors')
 const climbing = require("./functions/climbing.js");
 const graph = require("./functions/graph.js");
