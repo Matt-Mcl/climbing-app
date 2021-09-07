@@ -1,6 +1,6 @@
 const express = require("express");
 const redis = require("redis");
-const cors = require('cors')
+// const cors = require('cors');
 const climbing = require("./functions/climbing.js");
 const graph = require("./functions/graph.js");
 const path = require('path');
@@ -15,7 +15,7 @@ redisClient.on("connect", function () {
 
 // Setup Mongo client
 const mongoClient = new MongoClient('mongodb://127.0.0.1:27017');
-mongoClient.connect().then(() => {
+mongoClient.connect(() => {
   console.log(`MongoDB client connected`);
   saveClimbing();
 });
@@ -26,7 +26,7 @@ const climbingData = climbingdb.collection('climbingdata');
 // Setup webserver
 const app = express();
 const PORT = 8080;
-app.use(cors());
+// app.use(cors());
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
