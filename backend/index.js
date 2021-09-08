@@ -2,6 +2,7 @@ const express = require("express");
 const climbing = require("./functions/climbing.js");
 const graph = require("./functions/graph.js");
 const path = require('path');
+const cors = require('cors')
 const {MongoClient} = require('mongodb');
 
 // Setup Mongo client
@@ -17,6 +18,7 @@ const climbingData = climbingdb.collection('climbingdata');
 // Setup webserver
 const app = express();
 const PORT = 8080;
+app.use(cors());
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
