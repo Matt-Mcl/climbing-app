@@ -128,19 +128,18 @@ module.exports = {
   },
 
 
-  async rangeGraph(climbingData, args) {
-    if (!args) return {error: `No dates provided`}
-    if (!args[0]) return {error: `No start date provided`};
-    if (!args[1]) return {error: `No end date provided`};
+  async rangeGraph(climbingData, startdate, enddate) {
+    if (!startdate) return {error: `No start date provided`};
+    if (!enddate) return {error: `No end date provided`};
 
-    for (let i = 0; i < args.length; i++) {
-      if (!args[i].match(/^([0-9]{2}[/]){2}[0-9]{4}$/)) return {error: `${args[i]} is not a valid date`};
+    for (let date of [startdate, enddate]) {
+      if (!date.match(/^([0-9]{2}[/]){2}[0-9]{4}$/)) return {error: `${date} is not a valid date`};
     }
 
     let dates = [];
 
-    let start = formatDate(args[0]);
-    let end = formatDate(args[1]);
+    let start = formatDate(startdate);
+    let end = formatDate(enddate);
 
     if (end <= start) return {error: `End date must be after start date`};
 

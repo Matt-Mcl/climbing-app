@@ -36,7 +36,7 @@ app.get("/getgraph", async function (req, res) {
   if (req.query.type === 'default') {
     res.send(await graph.defaultGraph(climbingData, req.query.dates));
   } else if (req.query.type === 'range') {
-    res.send(await graph.rangeGraph(climbingData, [req.query.startdate, req.query.enddate]));
+    res.send(await graph.rangeGraph(climbingData, req.query.startdate, req.query.enddate));
   } else if (req.query.type === 'average') {
     res.send(await graph.averageGraph(climbingData, req.query.day, req.query.show));
   } else {
