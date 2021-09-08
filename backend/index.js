@@ -1,17 +1,8 @@
 const express = require("express");
-const redis = require("redis");
-// const cors = require('cors');
 const climbing = require("./functions/climbing.js");
 const graph = require("./functions/graph.js");
 const path = require('path');
 const {MongoClient} = require('mongodb');
-
-// Setup Redis client
-const redisClient = redis.createClient();
-
-redisClient.on("connect", function () {
-  console.log("Redis client connected");
-});
 
 // Setup Mongo client
 const mongoClient = new MongoClient('mongodb://127.0.0.1:27017');
@@ -26,7 +17,6 @@ const climbingData = climbingdb.collection('climbingdata');
 // Setup webserver
 const app = express();
 const PORT = 8080;
-// app.use(cors());
 
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
@@ -84,7 +74,6 @@ async function saveClimbing() {
   if (date.getMinutes() % 5 === 0 && (!(hours >= 22 || hours <= 9) || (hours === '22' && minutes < 5))) {
       const [count] = await climbing.getClimbingCount();
       console.log(`Logged [Climbing count: ${locale} | ${count}]`);
-      redisClient.set(`Climbing count: ${locale}`, `${count}`);
       climbingData.insertOne({ _id: locale, count: count}, (err, result) => { });
   }
 }
