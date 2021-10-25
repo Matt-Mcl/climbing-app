@@ -32,6 +32,11 @@ function App() {
           <Route path="/averagegraph" element={<AverageGraph />} />
         </Routes>
       </Container>
+
+      <Container style={{marginTop: "32px"}}>
+        <p>Note: No data available for 23/10/2021 - 24/10/2021</p>
+        <p>{new Date().getFullYear()} Copyright: <a href="https://climbing-app.co.uk">climbing-app.co.uk</a></p>
+      </Container>
     </>
   );
 }
