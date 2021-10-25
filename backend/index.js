@@ -46,6 +46,19 @@ app.get("/getgraph", async function (req, res) {
   }
 });
 
+app.use(require('express-status-monitor')({
+spans: [{
+  interval: 1,            // Every second in hour
+  retention: 3600
+}, {
+  interval: 60,            // Every minute in day
+  retention: 1440
+}, {
+  interval: 3600,           // Every hour in week
+  retention: 168
+}],
+}));
+
 // All other GET requests not handled before will return the React app
 app.get('*', (req, res) => {
   res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'));
