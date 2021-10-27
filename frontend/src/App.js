@@ -33,18 +33,18 @@ function App() {
     <>
       <ThemeProvider theme={theme === 'light' ? lightTheme : darkTheme}>
         <GlobalStyles />
-        <Navbar>
+        <Navbar expand="lg">
           <Container>
             <Navbar.Brand>Climbing App</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
-              <Nav>
+              <Nav className="me-auto">
                 <Nav.Link href="/">Home</Nav.Link>
                 <Nav.Link href="/creategraph">Create Graph</Nav.Link>
                 <Nav.Link href="/averagegraph">Average Graph</Nav.Link>
+                <p style={{marginTop: "8px"}}>Toggle Dark Mode:&nbsp;</p><Switch isToggled={isToggled} onToggle={() => themeSwitchToggle()}/>
               </Nav>
-              <Switch isToggled={isToggled} onToggle={() => themeSwitchToggle()} />
-              { console.log(isToggled) }
+              
             </Navbar.Collapse>
           </Container>
         </Navbar>

@@ -40,6 +40,7 @@ export const GlobalStyles = createGlobalStyle`
   }
   .switch {
     position: relative;
+    top: 4px;
     display: inline-block;
     width: 60px;
     height: 34px;
