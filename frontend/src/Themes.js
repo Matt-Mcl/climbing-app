@@ -8,6 +8,7 @@ export const lightTheme = {
   borders: "#d1cdc6",
   switchButtonColor: "#fff15a",
   switchButtonBorder: "#e1d33c",
+  invert: "invert(0)",
 };
 
 export const darkTheme = {
@@ -18,6 +19,7 @@ export const darkTheme = {
   borders: "#42484b",
   switchButtonColor: "#6b7abb",
   switchButtonBorder: "#394889",
+  invert: "invert(1)",
 };
 
 export const GlobalStyles = createGlobalStyle`
@@ -30,6 +32,7 @@ export const GlobalStyles = createGlobalStyle`
   }
   .nav-link {
     color: ${(props) => props.theme.fontColor} !important;
+    transition: none
   }
   .navbar-brand {
     color: ${(props) => props.theme.fontColor} !important;
@@ -37,10 +40,11 @@ export const GlobalStyles = createGlobalStyle`
   .line-chart {
     background-color: ${(props) => props.theme.graph};
   }
-  .form-control, .form-select {
+  .form-control, .form-select, .form-control:focus {
     color: ${(props) => props.theme.fontColor};
     background-color: ${(props) => props.theme.graph};
     border-color: ${(props) => props.theme.borders};
+    transition: none
   }
   .switch {
     position: relative;
@@ -75,12 +79,25 @@ export const GlobalStyles = createGlobalStyle`
     background-color: ${(props) => props.theme.switchButtonColor};
     border: 2px solid ${(props) => props.theme.switchButtonBorder};
     border-radius: 50%;
-    transition: 0.2s;
-  }
-  input:checked + .slider {
-    background-color: 
+    transition: 0.3s;
   }
   input:checked + .slider:before {
     transform: translateX(26px);
+  }
+  input::-webkit-calendar-picker-indicator { 
+    filter: ${(props) => props.theme.invert};
+  }
+  .form-select {
+    background-image:
+      linear-gradient(45deg, transparent 50%, ${(props) => props.theme.fontColor}  50%),
+      linear-gradient(135deg, ${(props) => props.theme.fontColor} 50%, transparent 50%);
+    background-position:
+      calc(100% - 20px) 16px,
+      calc(100% - 15px) 16px,
+      calc(100% - 40px) 8px;
+    background-size:
+      5px 5px,
+      5px 5px,
+      1px;
   }
 `;
