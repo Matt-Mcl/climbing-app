@@ -10,6 +10,8 @@ import { lightTheme, darkTheme, GlobalStyles } from "./Themes.js"
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row'
+import Col from 'react-bootstrap/Col'
 
 
 function App() {
@@ -42,7 +44,7 @@ function App() {
                 <Nav.Link href="/">Home</Nav.Link>
                 <Nav.Link href="/creategraph">Create Graph</Nav.Link>
                 <Nav.Link href="/averagegraph">Average Graph</Nav.Link>
-                <p style={{marginTop: "8px"}}>Toggle Dark Mode:&nbsp;</p><Switch isToggled={isToggled} onToggle={() => themeSwitchToggle()}/>
+                
               </Nav>
               
             </Navbar.Collapse>
@@ -58,8 +60,15 @@ function App() {
         </Container>
 
         <Container style={{marginTop: "32px"}}>
-          <p>Note: No data available for 23/10/2021 - 24/10/2021</p>
-          <p>{new Date().getFullYear()} Copyright: <a href="https://climbing-app.co.uk">climbing-app.co.uk</a></p>
+          <Row>
+            <Col>
+              <p>Note: No data available for 23/10/2021 - 24/10/2021</p>
+              <p>{new Date().getFullYear()} Copyright: <a href="https://climbing-app.co.uk">climbing-app.co.uk</a></p>
+            </Col>
+            <Col xs="auto">
+              <Switch isToggled={isToggled} onToggle={() => themeSwitchToggle()}/>
+            </Col>
+          </Row>
         </Container>
       </ThemeProvider>
     </>

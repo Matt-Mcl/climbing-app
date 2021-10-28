@@ -5,7 +5,9 @@ export const lightTheme = {
   navBackground: "#f8f9fa",
   fontColor: "#000",
   graph: "#f0f0f0",
-  borders: "#d1cdc6"
+  borders: "#d1cdc6",
+  switchButtonColor: "#fff15a",
+  switchButtonBorder: "#e1d33c",
 };
 
 export const darkTheme = {
@@ -13,7 +15,9 @@ export const darkTheme = {
   navBackground: "#1e2122",
   fontColor: "#fff",
   graph: "#232729",
-  borders: "#42484b"
+  borders: "#42484b",
+  switchButtonColor: "#6b7abb",
+  switchButtonBorder: "#394889",
 };
 
 export const GlobalStyles = createGlobalStyle`
@@ -21,7 +25,7 @@ export const GlobalStyles = createGlobalStyle`
     background-color: ${(props) => props.theme.background};
     color: ${(props) => props.theme.fontColor};
   }
-  .navbar.navbar-expand.navbar-light {
+  .navbar.navbar-expand-lg.navbar-light {
     background-color: ${(props) => props.theme.navBackground};
   }
   .nav-link {
@@ -58,16 +62,18 @@ export const GlobalStyles = createGlobalStyle`
     right: 0;
     bottom: 0;
     border-radius: 26px;
-    background-color: gray;
+    background-color: ${(props) => props.theme.graph};
+    border: 2px solid ${(props) => props.theme.borders};
   }
   .slider:before {
     position: absolute;
     content: "";
     height: 26px;
     width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
+    left: 2px;
+    bottom: 2px;
+    background-color: ${(props) => props.theme.switchButtonColor};
+    border: 2px solid ${(props) => props.theme.switchButtonBorder};
     border-radius: 50%;
     transition: 0.2s;
   }
