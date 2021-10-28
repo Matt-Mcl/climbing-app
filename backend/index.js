@@ -29,6 +29,12 @@ app.use(express.static(path.resolve(__dirname, '../frontend/build')));
 
 app.get("/data", async (req, res) => res.json(await climbingData.find().toArray()));
 
+app.get("/datacount", async function (req, res) {
+  const datacount = await climbingData.countDocuments();
+  const size = JSON.stringify(await climbingData.find().toArray()).length;
+  res.send(`${datacount} Entires using ${Math.floor(size/1024)}KB`);
+});
+
 app.get("/getclimbingcount", async function (req, res) {
   const [count, capacity] = await climbing.getClimbingCount();
   res.json({count: count, capacity: capacity});
@@ -48,7 +54,9 @@ app.get("/getgraph", async function (req, res) {
 
 // All other GET requests not handled before will return the React app
 app.get('*', (req, res) => {
-  res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'));
+  res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'), (error) => {
+    if (error) res.send('<h1>Website Rebuilding, please wait.</h1>');
+  });
 });
 
 // Retrieves components of the current date and time
