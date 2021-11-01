@@ -180,6 +180,8 @@ module.exports = {
     if (!day) return {error: 'No day provided'}; 
     if (show && !show.match(/(^true$)|(^false$)/)) return {error: 'Show must be a boolean value'}; 
 
+    day = day.toLowerCase();
+
     if (day.match(/(^today$)|(^t$)/)) {
       const date = new Date();
       day = days[date.getDay()];
@@ -189,16 +191,14 @@ module.exports = {
       day = days[date.getDay()];
     }
 
-    const inputDay = day.toLowerCase();
-
-    if (!days.includes(inputDay)) return {error: 'Invalid day provided'};
+    if (!days.includes(day)) return {error: 'Invalid day provided'};
 
     let start = new Date();
 
     let today = start.getDay();
-    let difference = days.indexOf(inputDay) - today;
+    let difference = days.indexOf(day) - today;
 
-    if ((days.indexOf(inputDay) - today) > 0) {
+    if ((days.indexOf(day) - today) > 0) {
       difference -= 7;
     }
 
