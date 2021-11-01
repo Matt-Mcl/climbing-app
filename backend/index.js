@@ -52,7 +52,7 @@ app.get("/getgraph", async function (req, res) {
     return res.send({error: 'No or invalid graph type provided'});
   }
 
-  if (req.query.asimage !== 'true') {
+  if (req.query.asimage !== 'true' || response.error) {
     res.send(response);
   } else {
     res.sendFile(path.resolve(__dirname, 'exportchart.png'));

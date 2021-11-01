@@ -1,4 +1,5 @@
 const ChartJsImage = require('chartjs-to-image');
+const path = require('path');
 
 const borderColours = ['rgb(200, 0, 0)', 'rgb(0, 200, 0)', 'rgb(0, 0, 200)', 'rgb(200, 200, 0)', 'rgb(200, 0, 200)', 'rgb(0, 200, 200)', 'rgb(255, 128, 0)'];
 
@@ -116,7 +117,7 @@ async function createGraph(climbingData, dates, asimage, averageData) {
     });
     myChart.setWidth(600).setHeight(300);
 
-    await myChart.toFile('exportchart.png');
+    await myChart.toFile(path.resolve(__dirname, '../exportchart.png'));
 
     return true;
   }
@@ -145,7 +146,7 @@ module.exports = {
       }
     }
 
-    return createGraph(climbingData, dates, asimage);
+    return await createGraph(climbingData, dates, asimage);
   },
 
 
@@ -171,7 +172,7 @@ module.exports = {
 
     if (dates.length > 7) return {error: 'Too many dates provided'};
 
-    return createGraph(climbingData, dates, asimage);
+    return await createGraph(climbingData, dates, asimage);
   },
 
   
@@ -218,6 +219,6 @@ module.exports = {
       start.setDate(start.getDate() + 7);
     }
 
-    return createGraph(climbingData, dates, asimage, { day: day.charAt(0).toUpperCase() + day.slice(1), show: show });
+    return await createGraph(climbingData, dates, asimage, { day: day.charAt(0).toUpperCase() + day.slice(1), show: show });
   }
 }
