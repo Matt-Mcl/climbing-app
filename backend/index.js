@@ -41,14 +41,21 @@ app.get("/getclimbingcount", async function (req, res) {
 });  
 
 app.get("/getgraph", async function (req, res) {
+  let response = "";
   if (req.query.type === 'default') {
-    res.send(await graph.defaultGraph(climbingData, req.query.dates));
+    response = await graph.defaultGraph(climbingData, req.query.dates, req.query.asimage);
   } else if (req.query.type === 'range') {
-    res.send(await graph.rangeGraph(climbingData, req.query.startdate, req.query.enddate));
+    response = await graph.rangeGraph(climbingData, req.query.startdate, req.query.enddate, req.query.asimage);
   } else if (req.query.type === 'average') {
-    res.send(await graph.averageGraph(climbingData, req.query.day, req.query.show));
+    response = await graph.averageGraph(climbingData, req.query.day, req.query.show, req.query.asimage);
   } else {
-    res.send({error: 'No or invalid graph type provided'});
+    return res.send({error: 'No or invalid graph type provided'});
+  }
+
+  if (req.query.asimage !== 'true') {
+    res.send(response);
+  } else {
+    res.sendFile(path.resolve(__dirname, 'exportchart.png'));
   }
 });
 
