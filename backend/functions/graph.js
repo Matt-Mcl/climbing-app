@@ -115,7 +115,7 @@ async function createGraph(climbingData, dates, asimage, averageData) {
       },
       options: options,
     });
-    myChart.setWidth(600).setHeight(300);
+    myChart.setWidth(450).setHeight(400);
 
     await myChart.toFile(path.resolve(__dirname, '../exportchart.png'));
 
