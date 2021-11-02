@@ -62,6 +62,8 @@ app.get("/getgraph", async function (req, res) {
     return res.send({error: 'No or invalid graph type provided'});
   }
 
+  if (response.error) res.status(400);
+
   if (!req.query.asimage || req.query.asimage[0] !== 'true' || response.error) {
     res.send(response);
   } else {
