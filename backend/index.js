@@ -43,7 +43,14 @@ app.get("/getclimbingcount", async function (req, res) {
 app.get("/getgraph", async function (req, res) {
 
   let response = "";
-  if (req.query.asimage) req.query.asimage = req.query.asimage.split(',')
+  if (req.query.asimage)  {
+    req.query.asimage = req.query.asimage.split(',')
+    if (req.query.asimage[1] < 1 || req.query.asimage[2] < 1) {
+      return res.send({error: 'Width and Height must be greater than 0'});
+    } else if (req.query.asimage[1] > 3000 || req.query.asimage[2] > 3000) {
+      return res.send({error: 'Width and Height must be less than 3000'});
+    }
+  }
 
   if (req.query.type === 'default') {
     response = await graph.defaultGraph(climbingData, req.query.dates, req.query.asimage);
@@ -54,7 +61,7 @@ app.get("/getgraph", async function (req, res) {
   } else {
     return res.send({error: 'No or invalid graph type provided'});
   }
-  
+
   if (!req.query.asimage || req.query.asimage[0] !== 'true' || response.error) {
     res.send(response);
   } else {
