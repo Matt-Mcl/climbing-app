@@ -96,7 +96,7 @@ async function createGraph(climbingData, dates, asimage, averageData) {
     })
   }
 
-  if (asimage !== 'true') {
+  if (!asimage || asimage[0] !== 'true') {
     return ({
       type: 'line',
       data: { 
@@ -106,6 +106,7 @@ async function createGraph(climbingData, dates, asimage, averageData) {
       options: options,
     });
   } else {
+    const [width, height] = [asimage[1], asimage[2]];
     let myChart = new ChartJsImage();
     myChart.setConfig({
       type: 'line',
@@ -115,7 +116,7 @@ async function createGraph(climbingData, dates, asimage, averageData) {
       },
       options: options,
     });
-    myChart.setWidth(450).setHeight(400);
+    myChart.setWidth(width).setHeight(height);
 
     await myChart.toFile(path.resolve(__dirname, '../exportchart.png'));
 
