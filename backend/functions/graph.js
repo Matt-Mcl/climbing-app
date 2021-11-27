@@ -11,7 +11,7 @@ const options = {
   scales: {
     y: {
       min: 0,
-      max: 130,
+      max: 150,
       ticks: {
         stepSize: 10
       },
