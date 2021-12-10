@@ -47,8 +47,8 @@ app.get("/getgraph", async function (req, res) {
     req.query.asimage = req.query.asimage.split(',')
     if (req.query.asimage[1] < 1 || req.query.asimage[2] < 1) {
       return res.send({error: 'Width and Height must be greater than 0'});
-    } else if (req.query.asimage[1] > 3000 || req.query.asimage[2] > 3000) {
-      return res.send({error: 'Width and Height must be less than 3000'});
+    } else if (req.query.asimage[1] > 1200 || req.query.asimage[2] > 600) {
+      return res.send({error: 'Width must be less than 1200 and Height must be less than 600'});
     }
   }
 
