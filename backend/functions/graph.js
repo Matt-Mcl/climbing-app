@@ -194,7 +194,7 @@ module.exports = {
 
     if (!days.includes(day)) return {error: 'Invalid day provided'};
 
-    let start = new Date();
+    let start = new Date(2022, 2, 5);
 
     let today = start.getDay();
     let difference = days.indexOf(day) - today;
