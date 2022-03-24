@@ -17,7 +17,7 @@ const climbingData = climbingdb.collection('climbingdata');
 
 // Setup webserver
 const app = express();
-const PORT = 8080;
+const PORT = 9080;
 app.use(cors());
 
 app.listen(PORT, () => {
