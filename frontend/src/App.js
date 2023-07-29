@@ -62,7 +62,8 @@ function App() {
         <Container style={{marginTop: "32px"}}>
           <Row>
             <Col>
-              <p>{new Date().getFullYear()} Copyright: <a href="https://climbing-app.co.uk">climbing-app.co.uk</a></p>
+              <p>Note: No data is available beyond 05/03/2022 (UK) as no count is currently being exposed by Oakwood. See <a href="https://www.oakwoodclimbingcentre.com/">Oakwood's Website</a> and <a href="https://portal.rockgympro.com/portal/public/2660c1de4a602e808732f0bcd3fea712/occupancy">the tracker</a></p>
+              <p>{new Date().getFullYear()} Copyright: <a href="https://climbing.manysite.net">climbing.manysite.net</a></p>
             </Col>
             <Col xs="auto">
               <Switch isToggled={isToggled} onToggle={() => themeSwitchToggle()}/>

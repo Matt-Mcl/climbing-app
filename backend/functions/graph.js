@@ -1,5 +1,6 @@
 const ChartJsImage = require('chartjs-to-image');
 const path = require('path');
+const Pool = require('pg').Pool
 
 const borderColours = ['rgb(200, 0, 0)', 'rgb(0, 200, 0)', 'rgb(0, 0, 200)', 'rgb(200, 200, 0)', 'rgb(200, 0, 200)', 'rgb(0, 200, 200)', 'rgb(255, 128, 0)'];
 
@@ -29,25 +30,45 @@ const options = {
   }
 };
 
+// Setup Postgres client
+const createPool = () => {
+  return new Pool({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'react_climbing',
+    port: 5432,
+  });
+}
+
 function formatDate(d) {
   return new Date(`${d.substring(6, 10)}-${d.substring(3, 5)}-${d.substring(0, 2)}`);
 }
 
-async function createGraph(climbingData, dates, asimage, averageData) {
+async function createGraph(dates, asimage, averageData) {
 
   let datasets = [];
+  const pool = createPool();
 
   for (let i = 0; i < dates.length; i++) {
     let offset = 0;
-    let data = await climbingData.find( { _id: { $regex: dates[i] }} ).toArray();
+    let data = [];
+
+    try {
+      const pool = createPool();
+      const res = await pool.query(`SELECT * FROM climbing WHERE datetime LIKE '${dates[i]}%' ORDER BY datetime`)
+      data = res.rows;
+    } catch (error) {
+      console.log(error)
+    }
+
     if (data.length === 0) return {error: `No data for ${dates[i]}`}; 
-    let label = formatDate(data[0]["_id"]);
+    let label = formatDate(data[0]["datetime"]);
     let counts = data.map(item => item.count);
 
     // If the dataset label isn't the current day
     if (label.setHours(0,0,0,0) !== new Date().setHours(0,0,0,0)) {
       for (let i = 0; i < times.length; i++) {
-        if (!data[i] || (data[i]["_id"].substring(12) !== times[i + offset])) {
+        if (!data[i] || (data[i]["datetime"].substring(12) !== times[i + offset])) {
           offset++;
           // Use the data from before to fill in
           if (counts[i-1]) {
@@ -67,6 +88,8 @@ async function createGraph(climbingData, dates, asimage, averageData) {
       pointRadius: 2.5,
     })
   }
+
+  await pool.end();
 
   if (averageData) {
     let averageCounts = [];
@@ -125,7 +148,7 @@ async function createGraph(climbingData, dates, asimage, averageData) {
 }
 
 module.exports = {
-  async defaultGraph(climbingData, args, asimage) {
+  async defaultGraph(args, asimage) {
     if (!args) return {error: 'No date(s) provided'}; 
     args = args.split(',');
     if (args.length > 7) return {error: 'Too many dates provided'};
@@ -147,11 +170,11 @@ module.exports = {
       }
     }
 
-    return await createGraph(climbingData, dates, asimage);
+    return await createGraph(dates, asimage);
   },
 
 
-  async rangeGraph(climbingData, startdate, enddate, asimage) {
+  async rangeGraph(startdate, enddate, asimage) {
     if (!startdate) return {error: `No start date provided`};
     if (!enddate) return {error: `No end date provided`};
 
@@ -173,11 +196,11 @@ module.exports = {
 
     if (dates.length > 7) return {error: 'Too many dates provided'};
 
-    return await createGraph(climbingData, dates, asimage);
+    return await createGraph(dates, asimage);
   },
 
   
-  async averageGraph(climbingData, day, show, asimage) {
+  async averageGraph(day, show, asimage) {
     if (!day) return {error: 'No day provided'}; 
     if (show && !show.match(/(^true$)|(^false$)/)) return {error: 'Show must be a boolean value'}; 
 
@@ -194,7 +217,7 @@ module.exports = {
 
     if (!days.includes(day)) return {error: 'Invalid day provided'};
 
-    let start = new Date();
+    let start = new Date(2022, 2, 5);
 
     let today = start.getDay();
     let difference = days.indexOf(day) - today;
@@ -220,6 +243,6 @@ module.exports = {
       start.setDate(start.getDate() + 7);
     }
 
-    return await createGraph(climbingData, dates, asimage, { day: day.charAt(0).toUpperCase() + day.slice(1), show: show });
+    return await createGraph(dates, asimage, { day: day.charAt(0).toUpperCase() + day.slice(1), show: show });
   }
 }

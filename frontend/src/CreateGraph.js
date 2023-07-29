@@ -30,7 +30,7 @@ function getDay(offset) {
 class CreateGraph extends Component {
   constructor() {
     super();
-    this.state = { dates: {startDate: getDay(6), endDate: getDay(0)}, graphData: null, error: '' };
+    this.state = { dates: {startDate: '2022-02-27', endDate: '2022-03-05'}, graphData: null, error: '' };
     this.handleStartDateChange = this.handleStartDateChange.bind(this);
     this.handleEndDateChange = this.handleEndDateChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
