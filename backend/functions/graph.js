@@ -47,6 +47,7 @@ function formatDate(d) {
 async function createGraph(dates, asimage, averageData) {
 
   let datasets = [];
+  const pool = createPool();
 
   for (let i = 0; i < dates.length; i++) {
     let offset = 0;
@@ -56,7 +57,6 @@ async function createGraph(dates, asimage, averageData) {
       const pool = createPool();
       const res = await pool.query(`SELECT * FROM climbing WHERE datetime LIKE '${dates[i]}%' ORDER BY datetime`)
       data = res.rows;
-      await pool.end();
     } catch (error) {
       console.log(error)
     }
@@ -88,6 +88,8 @@ async function createGraph(dates, asimage, averageData) {
       pointRadius: 2.5,
     })
   }
+
+  await pool.end();
 
   if (averageData) {
     let averageCounts = [];
