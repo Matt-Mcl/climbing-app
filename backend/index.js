@@ -2,17 +2,17 @@ const express = require("express");
 const climbing = require("./functions/climbing.js");
 const graph = require("./functions/graph.js");
 const path = require('path');
-const {MongoClient} = require('mongodb');
+const Pool = require('pg').Pool
 
-// Setup Mongo client
-const mongoClient = new MongoClient('mongodb://127.0.0.1:27017');
-mongoClient.connect(() => {
-  console.log(`MongoDB client connected`);
-  saveClimbing();
-});
-
-const climbingdb = mongoClient.db('climbingapp');
-const climbingData = climbingdb.collection('climbingdata');
+// Setup Postgres client
+const createPool = () => {
+  return new Pool({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'react_climbing',
+    port: 5432,
+  });
+}
 
 // Setup webserver
 const app = express();
@@ -25,12 +25,30 @@ app.listen(PORT, () => {
 // Have Node serve the files for our built React app
 app.use(express.static(path.resolve(__dirname, '../frontend/build')));
 
-app.get("/data", async (req, res) => res.json(await climbingData.find().toArray()));
+app.get("/data", async function (req, res) {
+  let data = [];
+  try {
+    const pool = createPool();
+    const res = await pool.query('SELECT * FROM climbing ORDER BY datetime')
+    data = res.rows;
+    await pool.end();
+  } catch (error) {
+    console.log(error)
+  }
+  res.json(data);
+});
 
 app.get("/datacount", async function (req, res) {
-  const datacount = await climbingData.countDocuments();
-  const size = JSON.stringify(await climbingData.find().toArray()).length;
-  res.send(`${datacount} Entires using ${Math.floor(size/1024)}KB`);
+  let count = 0;
+  try {
+    const pool = createPool();
+    const res = await pool.query('SELECT COUNT(*) FROM climbing')
+    count = res.rows[0]["count"];
+    await pool.end();
+  } catch (error) {
+    console.log(error)
+  }
+  res.send(`${count} Entires`);
 });
 
 app.get("/getclimbingcount", async function (req, res) {
@@ -51,11 +69,11 @@ app.get("/getgraph", async function (req, res) {
   }
 
   if (req.query.type === 'default') {
-    response = await graph.defaultGraph(climbingData, req.query.dates, req.query.asimage);
+    response = await graph.defaultGraph(req.query.dates, req.query.asimage);
   } else if (req.query.type === 'range') {
-    response = await graph.rangeGraph(climbingData, req.query.startdate, req.query.enddate, req.query.asimage);
+    response = await graph.rangeGraph(req.query.startdate, req.query.enddate, req.query.asimage);
   } else if (req.query.type === 'average') {
-    response = await graph.averageGraph(climbingData, req.query.day, req.query.show, req.query.asimage);
+    response = await graph.averageGraph(req.query.day, req.query.show, req.query.asimage);
   } else {
     return res.send({error: 'No or invalid graph type provided'});
   }
@@ -99,8 +117,16 @@ async function saveClimbing() {
   setTimeout(saveClimbing, timeoutMinutes * 60 * 1000);
 
   if (date.getMinutes() % 5 === 0 && (!(hours >= 22 || hours <= 9) || (hours === '22' && minutes < 5))) {
-      const [count] = await climbing.getClimbingCount();
-      console.log(`Logged [Climbing count: ${locale} | ${count}]`);
-      climbingData.insertOne({ _id: locale, count: count}, (err, result) => { });
+    const [count] = await climbing.getClimbingCount();
+    console.log(`Logged [Climbing count: ${locale} | ${count}]`);
+    try {
+      const pool = createPool();
+      const res = await pool.query('INSERT INTO climbing (datetime, count) VALUES ($1, $2)', [locale, count])
+      await pool.end();
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
+
+saveClimbing();
